@@ -366,8 +366,14 @@ class User():
             UserToSendTo = Parameter[0]
             with sqlite3.connect("Data.db") as db:
                 cursor = db.cursor()
-                Values = (self.FindUserID(UserToSendTo), Amount)
-                sql = """SELECT Balance FROM"""
+                Values = (Amount, self.FindUserID(UserToSendTo))
+                sql = """UPDATE Bank
+                         SET Balance = Balance + ?
+                         WHERE UserID = ?
+                      """
+                cursor.execute(sql, Values)
+            self.Balance = self.Balance - Amount
+            self.UpdateBalance()
         elif Cmd == "cmds":
             print("'Balance' -- Checks Your Balance \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money")
 
