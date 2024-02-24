@@ -381,7 +381,7 @@ class User():
         elif Cmd == "banking":
             self.Bank(Parameter)
         elif Cmd == "cmds":
-            print("'Cmds' -- Gives List Of All Commands \n")
+            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App")
         
     def CheckMessages(self):
         pass

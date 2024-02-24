@@ -21,14 +21,15 @@ def Bank(Exit):
             CurrentUser.Command(FinalCommand)
 
 def Main(Exit):
+    print("Use 'cmds' For Commands")
     UserCommands = Commands.Commands()
     UserCommands.Initialise(CurrentUser.UserID)
     while Exit != True:
         UserInput = input(">")
         if UserInput.lower() == "message":
-            Message()
+            Message(Exit)
         elif UserInput.lower() == "bank":
-            Bank()
+            Bank(Exit)
         elif UserInput.lower() == "exit":
             Exit = True
         else:
