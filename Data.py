@@ -1,4 +1,5 @@
 import sqlite3
+import Encrypt
 
 def Initialise():
     with sqlite3.connect("Data.db") as db:
@@ -23,6 +24,14 @@ def Initialise():
                  Primary key(MessageID));
                """
         cursor.execute(sql)
+    with sqlite3.connect("Data.db") as db:
+        cursor = db.cursor()
+        sql = """CREATE TABLE IF NOT EXISTS Bank(
+                 UserID integer,
+                 Balance integer,
+                 Primary key(UserID));
+               """
+        cursor.execute(sql)
 def ViewTable():
     with sqlite3.connect("Data.db") as db:
         cursor = db.cursor()
@@ -41,6 +50,7 @@ class User():
         self.Password = ""
         self.UserID = 0
         self.TempMessageList = ""
+        self.Balance = 0
 
     def GetUsername(self):
         return self.Username
@@ -60,6 +70,9 @@ class User():
     def GetUserID(self):
         return self.UserID
     
+    def GetBalance(self):
+        return self.Balance
+    
     def SetUserID(self, UserID):
         self.UserID = UserID
 
@@ -77,6 +90,9 @@ class User():
 
     def SetPassword(self, Password):
         self.Password = Password
+    
+    def SetBalance(self, Balance):
+        self.Balance = Balance
 
     def LogAssociate(self, UserID):
         try:
@@ -94,6 +110,13 @@ class User():
                 self.SetUsername(result[3])
                 self.SetEmail(result[4])
                 self.SetPassword(result[5])
+                Values = (self.GetUserID(),)
+                sql = """SELECT Balance FROM Bank
+                        WHERE UserID = ?;
+                      """
+                cursor.execute(sql, Values)
+                result = cursor.fetchone()
+                self.SetBalance(result[0])
         except:
             return False
         
@@ -179,6 +202,13 @@ class User():
                 sql = """INSERT INTO User(Firstname, Lastname, Username, Email, Password)
                         Values(?, ?, ?, ?, ?)
                     """
+                cursor.execute(sql, Values)
+                db.commit()
+                UserID = self.FindUserID(Username)
+                Values = (UserID, 0)
+                sql = """INSERT INTO Bank(UserID, Balance)
+                         Values(?, ?)
+                      """
                 cursor.execute(sql, Values)
                 db.commit()
                 return True
@@ -297,6 +327,49 @@ class User():
                         print("All Messages Successfully Deleted!")
             except:
                 print("Message Failed To Delete")
+        elif Cmd == "cmds":
+            print("'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message")
+
+    def UpdateBalance(self):
+        with sqlite3.connect("Data.db") as db:
+            cursor = db.cursor()
+            Values = (self.GetBalance(), self.GetUserID())
+            sql = """UPDATE Bank
+                     SET Balance = ?
+                     WHERE UserID = ?
+                  """
+            cursor.execute(sql, Values)
+            db.commit()
+            return True
+
+    def Bank(self, Parameter):
+        print(Parameter)
+        Cmd = Parameter[0].lower()
+        del Parameter[0]
+        if Cmd == "balance":
+            try:
+                with sqlite3.connect("Data.db") as db:
+                    cursor = db.cursor()
+                    Values = (self.GetUserID(),)
+                    sql = """SELECT Balance FROM Bank
+                             WHERE UserID = ?
+                            """
+                    cursor.execute(sql, Values)
+                    result, = cursor.fetchone()
+                    print(f"Balance: {result}")
+                    self.SetBalance(1200)
+                    self.UpdateBalance()
+            except:
+                print("Error Getting Balance")
+        elif Cmd == "send":
+            Amount = int(Parameter[1])
+            UserToSendTo = Parameter[0]
+            with sqlite3.connect("Data.db") as db:
+                cursor = db.cursor()
+                Values = (self.FindUserID(UserToSendTo), Amount)
+                sql = """SELECT Balance FROM"""
+        elif Cmd == "cmds":
+            print("'Balance' -- Checks Your Balance \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
@@ -305,11 +378,10 @@ class User():
         del Parameter[0]
         if Cmd == "messaging":
             self.Messaging(Parameter)
-        if Cmd == "cmds":
-            self.Cmds()
-
-    def Cmds(self):
-        print("'Cmds' -- Gives List Of All Commands \n'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message")
+        elif Cmd == "banking":
+            self.Bank(Parameter)
+        elif Cmd == "cmds":
+            print("'Cmds' -- Gives List Of All Commands \n")
         
     def CheckMessages(self):
         pass
