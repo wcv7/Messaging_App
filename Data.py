@@ -231,7 +231,7 @@ class User():
                     """
                 cursor.execute(sql, Values)
                 result = cursor.fetchone()
-                return result
+                return result[0]
         except:
             print("Error Retrieving Balance")
         
@@ -411,7 +411,7 @@ class User():
                 Password = Parameter[2]
                 UserIDToGetFrom = self.FindUserID(UserToGetFrom)
                 if self.CheckPassword(Password, UserIDToGetFrom):
-                    if self.CheckBalanceFromUserID(UserIDToGetFrom) > Amount:
+                    if self.CheckBalanceFromUserID(UserIDToGetFrom) >= Amount:
                         try:
                             with sqlite3.connect("Data.db") as db:
                                 cursor = db.cursor()
@@ -430,7 +430,7 @@ class User():
                 else:
                     print("Wrong Password!")
             except:
-                print("Entered Command Wrong")
+                print("Error")
         elif Cmd == "cmds":
             print("'Balance' '{Username}' '{Password}' -- Checks Balance, Username If You Want To See Another Account \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money \n'Transfer' '{Username}' '{Amount}' '{Password}' -- Transfers Amount From Account")
 
