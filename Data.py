@@ -168,6 +168,7 @@ class User():
     def CheckPassword(self, Password, UserID):
         try:
             Values = (UserID,)
+            Password = Encrypt.Encryptor.Encrypt(Password)
             with sqlite3.connect("Data.db") as db:
                 cursor = db.cursor()
                 sql = """SELECT Password FROM User
@@ -196,6 +197,7 @@ class User():
         
     def CreateAccount(self, FName, LName, Username, Email, Password):
         try:
+            Password = Encrypt.Encryptor.Encrypt(Password)
             Values = (FName, LName, Username, Email, Password)
             with sqlite3.connect("Data.db") as db:
                 cursor = db.cursor()
@@ -245,6 +247,7 @@ class User():
             Message = ""
             for each in Parameter:
                 Message += each + " "
+            Message = Encrypt.Encryptor.Encrypt(Message)
             print(Message)
             if self.SearchUser(UserTo):
                 SendToUser = self.FindUserID(UserTo)
@@ -298,6 +301,7 @@ class User():
                             """
                         cursor.execute(sql, Values)
                         result, = cursor.fetchone()
+                        result = Encrypt.Encryptor.Decrypt(result)
                         print(result)
                 else:
                     with sqlite3.connect("Data.db") as db:
