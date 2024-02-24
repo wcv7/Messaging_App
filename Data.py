@@ -16,10 +16,11 @@ def Initialise():
     with sqlite3.connect("Data.db") as db:
         cursor = db.cursor()
         sql = """CREATE TABLE IF NOT EXISTS Message(
+                 MessageID integer,
                  UserID integer,
-                 UserSent text,
+                 UserIDSent text,
                  Message text,
-                 Primary key(UserID));
+                 Primary key(MessageID));
                """
         cursor.execute(sql)
 def ViewTable():
@@ -39,6 +40,7 @@ class User():
         self.Email = ""
         self.Password = ""
         self.UserID = 0
+        self.TempMessageList = ""
 
     def GetUsername(self):
         return self.Username
@@ -95,17 +97,31 @@ class User():
         except:
             return False
         
-    def SearchUser(self, Username):
+    def GetUsernameFromID(self, UserID):
         try:
-            Values = (Username,)
+            Values = (UserID,)
             with sqlite3.connect("Data.db") as db:
                 cursor = db.cursor()
                 sql = """SELECT Username FROM User
-                        WHERE Username = ?;
+                        WHERE UserID = ?;
                     """
                 cursor.execute(sql, Values)
                 result, = cursor.fetchone()
-                if result == Username:
+                return result
+        except:
+            return "Failed To Get Username"
+        
+    def SearchUser(self, Field):
+        try:
+            Values = (Field, Field)
+            with sqlite3.connect("Data.db") as db:
+                cursor = db.cursor()
+                sql = """SELECT Username FROM User
+                        WHERE Username = ? OR UserID = ?;
+                    """
+                cursor.execute(sql, Values)
+                result, = cursor.fetchone()
+                if result == Field:
                     return True
                 else:
                     return False
@@ -175,31 +191,118 @@ class User():
             return True
         else:
             return False
-        
+
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
         print(Parameter)
-        Cmd = Parameter[0]
-        if Cmd == "Message":
-            UserTo = Parameter[1]
-            print(UserTo)
-            for each in Parameter:
-                print(each)
-            print(Parameter)
+        Cmd = Parameter[0].lower()
+        del Parameter[0]
+        if Cmd == "message":
+            UserTo = Parameter[0]
             del Parameter[0]
-            del Parameter[1]
-            print(Parameter)
+            Message = ""
             for each in Parameter:
-                print(each)
+                Message += each + " "
+            print(Message)
             if self.SearchUser(UserTo):
                 SendToUser = self.FindUserID(UserTo)
-                UserTo = None
-                Values = (SendToUser, self.GetUsername, Parameter[2])
-        if Cmd == "Cmds":
+                Values = (SendToUser, self.GetUserID(), Message)
+                try:
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        sql = """INSERT INTO Message(UserID, UserIDSent, Message)
+                                Values(?, ?, ?)
+                            """
+                        cursor.execute(sql, Values)
+                        db.commit()
+                        print("Message Sent!")
+                except:
+                    print("Message Failed To Send")
+            else:
+                print("User Does Not Exist")
+        elif Cmd == "inbox":
+            try:
+                with sqlite3.connect("Data.db") as db:
+                    cursor = db.cursor()
+                    Values = (self.GetUserID(),)
+                    sql = """SELECT MessageID, UserIDSent FROM Message
+                            WHERE UserID = ?;
+                        """
+                    cursor.execute(sql, Values)
+                    result = cursor.fetchall()
+                    self.TempMessageList = result
+                    i = 1
+                    for each in result:
+                        Username = self.GetUsernameFromID(each[1])
+                        if Username == "Failed To Get Username":
+                            print("Error Getting Message")
+                        else:
+                            print(i, "- Message From " + Username)
+                        i += 1
+            except:
+                print("Error Getting Inbox")
+        elif Cmd == "recieve":
+            try:
+                MessageToRecieve = Parameter[0]
+                if MessageToRecieve != "all":
+                    MessageToRecieve = int(MessageToRecieve)
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        MessageTuple = self.TempMessageList[MessageToRecieve-1]
+                        MessageID = MessageTuple[0]
+                        Values = (MessageID,)
+                        sql = """SELECT Message FROM Message
+                                WHERE MessageID = ?;
+                            """
+                        cursor.execute(sql, Values)
+                        result, = cursor.fetchone()
+                        print(result)
+                else:
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        Values = (self.GetUserID(),)
+                        sql = """SELECT Message FROM Message
+                                WHERE UserID = ?;
+                            """
+                        cursor.execute(sql, Values)
+                        result = cursor.fetchall()
+                        for each in result:
+                            print(each[0])
+            except:
+                print("Message Failed To Recieve")
+        elif Cmd == "delete":
+            try:
+                MessageToDelete = Parameter[0]
+                if MessageToDelete != "all":
+                    MessageToDelete = int(MessageToDelete)
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        MessageTuple = self.TempMessageList[MessageToDelete-1]
+                        MessageID = MessageTuple[0]
+                        Values = (MessageID,)
+                        sql = """DELETE FROM Message
+                                WHERE MessageID = ?;
+                            """
+                        cursor.execute(sql, Values)
+                        db.commit()
+                        print("Successfully Deleted Message!")
+                else:
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        Values = (self.GetUserID(),)
+                        sql = """DELETE FROM Message
+                                WHERE UserID = ?;
+                            """
+                        cursor.execute(sql, Values)
+                        db.commit()
+                        print("All Messages Successfully Deleted!")
+            except:
+                print("Message Failed To Delete")
+        elif Cmd == "cmds":
             self.Cmds()
-
+            
     def Cmds(self):
-        print("'Message' '{Username}' '{Message}' -- Put Message In Quotes")
+        print("'Cmds' -- Gives List Of All Commands \n'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message")
         
     def CheckMessages(self):
         pass
