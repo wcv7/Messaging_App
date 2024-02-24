@@ -1,5 +1,6 @@
 import Data
 import Commands
+import os
 Data.Initialise()
 
 def Message(Exit):
@@ -7,6 +8,8 @@ def Message(Exit):
         UserInput = input("Messaging >")
         if UserInput.lower() == "back":
             break
+        elif UserInput.lower() == "clear":
+            os.system("cls")
         else:
             FinalCommand = "Messaging " + UserInput
             CurrentUser.Command(FinalCommand)
@@ -16,6 +19,8 @@ def Bank(Exit):
         UserInput = input("Bank >")
         if UserInput.lower() == "back":
             break
+        elif UserInput.lower() == "clear":
+            os.system("cls")
         else:
             FinalCommand = "Banking " + UserInput
             CurrentUser.Command(FinalCommand)
@@ -28,8 +33,12 @@ def Main(Exit):
         UserInput = input(">")
         if UserInput.lower() == "message":
             Message(Exit)
+        elif UserInput.lower() == "clear":
+            os.system("cls")
         elif UserInput.lower() == "bank":
             Bank(Exit)
+        elif UserInput.lower() == "logout":
+            Login(Exit)
         elif UserInput.lower() == "exit":
             Exit = True
         else:
@@ -37,6 +46,8 @@ def Main(Exit):
 
 def Login(Exit):
     FieldInput = input("Enter Your Username Or Email: ")
+    if FieldInput.lower() == "signup":
+        SignUp(Exit)
     PasswordInput = input("Enter Your Password: ")
     if CurrentUser.Login(FieldInput, PasswordInput):
         Main(Exit)
@@ -46,6 +57,8 @@ def Login(Exit):
 
 def SignUp(Exit):
     FNInput = input("Enter Your Firstname: ")
+    if FNInput.lower() == "login":
+        Login(Exit)
     LNInput = input("Enter Your Lastname:  ")
     UserInput = input("Enter A Username: ")
     if CurrentUser.SearchUser(UserInput):

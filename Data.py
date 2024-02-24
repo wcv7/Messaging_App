@@ -215,12 +215,25 @@ class User():
         except:
             return False
 
-
     def SignUp(self, FName, LName, Username, Email, Password):
         if self.CreateAccount(FName, LName, Username, Email, Password):
             return True
         else:
             return False
+        
+    def CheckBalanceFromUserID(self, UserID):
+        try:
+            with sqlite3.connect("Data.db") as db:
+                cursor = db.cursor()
+                Values = (UserID,)
+                sql = """SELECT Balance FROM Bank
+                        WHERE UserID = ?
+                    """
+                cursor.execute(sql, Values)
+                result = cursor.fetchone()
+                return result
+        except:
+            print("Error Retrieving Balance")
         
     def Messaging(self, Parameter):
         print(Parameter)
@@ -347,35 +360,77 @@ class User():
         Cmd = Parameter[0].lower()
         del Parameter[0]
         if Cmd == "balance":
-            try:
-                with sqlite3.connect("Data.db") as db:
-                    cursor = db.cursor()
-                    Values = (self.GetUserID(),)
-                    sql = """SELECT Balance FROM Bank
-                             WHERE UserID = ?
-                            """
-                    cursor.execute(sql, Values)
-                    result, = cursor.fetchone()
-                    print(f"Balance: {result}")
-                    self.SetBalance(1200)
-                    self.UpdateBalance()
-            except:
-                print("Error Getting Balance")
+            if len(Parameter) > 0:
+                try:
+                    UserToCheckBalance = Parameter[0]
+                    Password = Parameter[1]
+                    UserIDToCheckBalance = self.FindUserID(UserToCheckBalance)
+                    if self.CheckPassword(Password, UserIDToCheckBalance):
+                        print(f"Balance: {self.CheckBalanceFromUserID(UserIDToCheckBalance)}")
+                    else:
+                        print("Wrong Password")
+                except:
+                    print("You Entered Command Wrong Or Got Wrong Password")
+            else:
+                try:
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        Values = (self.GetUserID(),)
+                        sql = """SELECT Balance FROM Bank
+                                WHERE UserID = ?
+                                """
+                        cursor.execute(sql, Values)
+                        result, = cursor.fetchone()
+                        print(f"Balance: {result}")
+                        self.UpdateBalance()
+                except:
+                    print("Error Getting Balance")
         elif Cmd == "send":
-            Amount = int(Parameter[1])
-            UserToSendTo = Parameter[0]
-            with sqlite3.connect("Data.db") as db:
-                cursor = db.cursor()
-                Values = (Amount, self.FindUserID(UserToSendTo))
-                sql = """UPDATE Bank
-                         SET Balance = Balance + ?
-                         WHERE UserID = ?
-                      """
-                cursor.execute(sql, Values)
-            self.Balance = self.Balance - Amount
-            self.UpdateBalance()
+            try:
+                Amount = int(Parameter[1])
+                UserToSendTo = Parameter[0]
+                if Amount < self.Balance:
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        Values = (Amount, self.FindUserID(UserToSendTo))
+                        sql = """UPDATE Bank
+                                SET Balance = Balance + ?
+                                WHERE UserID = ?
+                            """
+                        cursor.execute(sql, Values)
+                    self.Balance = self.Balance - Amount
+                    self.UpdateBalance()
+                else:
+                    print("Not Enough In Your Account")
+            except:
+                print("Entered Command Wrong")
+        elif Cmd == "transfer":
+            try:
+                Amount = int(Parameter[1])
+                UserToGetFrom = Parameter[0]
+                Password = Parameter[2]
+                UserIDToGetFrom = self.FindUserID(UserToGetFrom)
+                if self.CheckPassword(Password, UserIDToGetFrom):
+                    if self.CheckBalanceFromUserID(UserIDToGetFrom) > Amount:
+                        try:
+                            with sqlite3.connect("Data.db") as db:
+                                cursor = db.cursor()
+                                Values = (Amount, UserIDToGetFrom)
+                                sql = """UPDATE Bank
+                                        SET Balance = Balance - ?
+                                        WHERE UserID = ?
+                                    """
+                                cursor.execute(sql, Values)
+                            self.Balance = self.Balance + Amount
+                            self.UpdateBalance()
+                        except:
+                            print("Error Transfering")
+                else:
+                    print("Wrong Password!")
+            except:
+                print("Entered Command Wrong")
         elif Cmd == "cmds":
-            print("'Balance' -- Checks Your Balance \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money")
+            print("'Balance' '{Username}' '{Password}' -- Checks Balance, Username If You Want To See Another Account \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money \n'Transfer' '{Username}' '{Amount}' '{Password}' -- Transfers Amount From Account")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
