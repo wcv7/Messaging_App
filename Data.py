@@ -425,6 +425,8 @@ class User():
                             self.UpdateBalance()
                         except:
                             print("Error Transfering")
+                    else:
+                        print("Not Enough In The Account")
                 else:
                     print("Wrong Password!")
             except:
