@@ -8,4 +8,5 @@ class Commands():
     def GetUserID(self):
         return self.UserID
     
-    
+    def ConnectServer(self, Server):
+        pass
