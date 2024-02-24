@@ -13,6 +13,15 @@ def Initialise():
                  Primary key(UserID));
                """
         cursor.execute(sql)
+    with sqlite3.connect("Data.db") as db:
+        cursor = db.cursor()
+        sql = """CREATE TABLE IF NOT EXISTS Message(
+                 UserID integer,
+                 UserSent text,
+                 Message text,
+                 Primary key(UserID));
+               """
+        cursor.execute(sql)
 def ViewTable():
     with sqlite3.connect("Data.db") as db:
         cursor = db.cursor()
@@ -166,3 +175,37 @@ class User():
             return True
         else:
             return False
+        
+    def Command(self, Parameter):
+        Parameter = Parameter.split(" ")
+        print(Parameter)
+        Cmd = Parameter[0]
+        if Cmd == "Message":
+            UserTo = Parameter[1]
+            print(UserTo)
+            for each in Parameter:
+                print(each)
+            print(Parameter)
+            del Parameter[0]
+            del Parameter[1]
+            print(Parameter)
+            for each in Parameter:
+                print(each)
+            if self.SearchUser(UserTo):
+                SendToUser = self.FindUserID(UserTo)
+                UserTo = None
+                Values = (SendToUser, self.GetUsername, Parameter[2])
+        if Cmd == "Cmds":
+            self.Cmds()
+
+    def Cmds(self):
+        print("'Message' '{Username}' '{Message}' -- Put Message In Quotes")
+        
+    def CheckMessages(self):
+        pass
+
+    def CheckMessagesFrom(self, FromUser):
+        pass
+        
+    def Message(self, ToUser, Message):
+        pass

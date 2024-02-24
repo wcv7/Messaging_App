@@ -1,12 +1,14 @@
 import Data
 import Commands
 Data.Initialise()
+Exit = False
 
 def Main():
     UserCommands = Commands.Commands()
     UserCommands.Initialise(CurrentUser.UserID)
-    print(UserCommands.GetUserID())
-    input(">")
+    while Exit != True:
+        UserInput = input(">")
+        CurrentUser.Command(UserInput)
 
 def Login():
     FieldInput = input("Enter Your Username Or Email: ")
