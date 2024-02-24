@@ -191,9 +191,8 @@ class User():
             return True
         else:
             return False
-
-    def Command(self, Parameter):
-        Parameter = Parameter.split(" ")
+        
+    def Messaging(self, Parameter):
         print(Parameter)
         Cmd = Parameter[0].lower()
         del Parameter[0]
@@ -298,9 +297,17 @@ class User():
                         print("All Messages Successfully Deleted!")
             except:
                 print("Message Failed To Delete")
-        elif Cmd == "cmds":
+
+    def Command(self, Parameter):
+        Parameter = Parameter.split(" ")
+        print(Parameter)
+        Cmd = Parameter[0].lower()
+        del Parameter[0]
+        if Cmd == "messaging":
+            self.Messaging(Parameter)
+        if Cmd == "cmds":
             self.Cmds()
-            
+
     def Cmds(self):
         print("'Cmds' -- Gives List Of All Commands \n'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message")
         

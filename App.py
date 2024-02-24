@@ -3,12 +3,23 @@ import Commands
 Data.Initialise()
 Exit = False
 
+def Message():
+    while Exit != True:
+        UserInput = input("Messaging >")
+        if UserInput.lower() == "back":
+            break
+        FinalCommand = "Messaging " + UserInput
+        CurrentUser.Command(FinalCommand)
+
 def Main():
     UserCommands = Commands.Commands()
     UserCommands.Initialise(CurrentUser.UserID)
     while Exit != True:
         UserInput = input(">")
-        CurrentUser.Command(UserInput)
+        if UserInput.lower() == "message":
+            Message()
+        else:
+            CurrentUser.Command(UserInput)
 
 def Login():
     FieldInput = input("Enter Your Username Or Email: ")
