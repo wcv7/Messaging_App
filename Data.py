@@ -183,22 +183,22 @@ class User():
                     return False
         except:
             return False
-        
-    def UpdatePassword(self, Password, UserID):
-        try:
-            Password = Encrypt.Encryptor.Encrypt(Password)
-            Values = (Password, UserID)
-            print(Password)
-            with sqlite3.connect("Data.db") as db:
-                cursor = db.cursor()
-                sql = """UPDATE User
-                         SET Password = ?
-                         WHERE UserID = ?
-                      """
-                cursor.execute(sql, Values)
-                print("Changed Password")
-        except:
-            print("Errror Updating")
+
+    def UpdateData(self, Data , Field, UserID):
+        if Data == "password":
+            Field = Encrypt.Encryptor.Encrypt(Field)
+        Data = Data.capitalize()
+        print(Data)
+        Values = (Field, UserID)
+        with sqlite3.connect("Data.db") as db:
+            cursor = db.cursor()
+            sql = """UPDATE User
+                     SET {} = ?
+                     WHERE UserID = ?
+                    """.format(Data)
+            cursor.execute(sql, Values)
+            db.commit()
+            print("Updated", Data)
             
     def Login(self, Field, Password):
         Values = (Field, Password)
@@ -413,7 +413,7 @@ class User():
             except:
                 print("Message Failed To Delete")
         elif Cmd == "cmds":
-            print("'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message \n'Outbox' -- Checks All Outgoing Messages")
+            print("'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message \n'Outbox' -- Checks All Outgoing Messages \n'Back' -- Goes Back To Main App")
 
     def UpdateBalance(self):
         with sqlite3.connect("Data.db") as db:
@@ -504,7 +504,7 @@ class User():
             except:
                 print("Error")
         elif Cmd == "cmds":
-            print("'Balance' '{Username}' '{Password}' -- Checks Balance, Username If You Want To See Another Account \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money \n'Transfer' '{Username}' '{Amount}' '{Password}' -- Transfers Amount From Account")
+            print("'Balance' '{Username}' '{Password}' -- Checks Balance, Username If You Want To See Another Account \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money \n'Transfer' '{Username}' '{Amount}' '{Password}' -- Transfers Amount From Account \n'Back' -- Goes Back To Main App")
 
     def Settings(self, Parameter):
         print(Parameter)
@@ -514,18 +514,27 @@ class User():
             Cmd2 = Parameter[0].lower()
             del Parameter[0]
             if Cmd2 == "password":
-                print(Parameter)
                 Password = Parameter[0]
                 NewPass = Parameter[1]
-                print(Password)
-                print(NewPass)
                 if self.CheckPassword(Password, self.GetUserID()):
-                    self.UpdatePassword(NewPass, self.GetUserID())
+                    self.UpdateData(Cmd2, NewUser, self.GetUserID())
                     print("Success")
                 else:
                     print("Wrong Password!")
+            elif Cmd2 == "username":
+                Username = Parameter[0]
+                NewUser = Parameter[1]
+                if self.SearchUser(NewUser):
+                    print("Username Already Exists")
+                else:
+                    self.UpdateData(Cmd2, NewUser, self.GetUserID())
+                    print("Success")
+            elif Cmd2 == "email":
+                pass
+            else:
+                print("Wrong Command")
         elif Cmd == "cmds":
-            print("'Update' '{Password / Username / Email}' '{Old Data}' '{New Data}' '{Confirm Data}' -- Updates Values")
+            print("'Update' '{Password / Username / Email}' '{Old Data}' '{New Data}' -- Updates Values \n'Back' -- Goes Back To Main App")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
@@ -539,4 +548,4 @@ class User():
         elif Cmd == "banking":
             self.Bank(Parameter)
         elif Cmd == "cmds":
-            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings")
+            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings \n'Exit' -- Exits App")
