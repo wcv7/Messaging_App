@@ -169,6 +169,7 @@ class User():
         try:
             Values = (UserID,)
             Password = Encrypt.Encryptor.Encrypt(Password)
+            print(Password)
             with sqlite3.connect("Data.db") as db:
                 cursor = db.cursor()
                 sql = """SELECT Password FROM User
@@ -182,6 +183,22 @@ class User():
                     return False
         except:
             return False
+        
+    def UpdatePassword(self, Password, UserID):
+        try:
+            Password = Encrypt.Encryptor.Encrypt(Password)
+            Values = (Password, UserID)
+            print(Password)
+            with sqlite3.connect("Data.db") as db:
+                cursor = db.cursor()
+                sql = """UPDATE User
+                         SET Password = ?
+                         WHERE UserID = ?
+                      """
+                cursor.execute(sql, Values)
+                print("Changed Password")
+        except:
+            print("Errror Updating")
             
     def Login(self, Field, Password):
         Values = (Field, Password)
@@ -286,6 +303,27 @@ class User():
                         i += 1
             except:
                 print("Error Getting Inbox")
+        elif Cmd == "outbox":
+            try:
+                with sqlite3.connect("Data.db") as db:
+                    cursor = db.cursor()
+                    Values = (self.GetUserID(),)
+                    sql = """SELECT MessageID, UserID FROM Message
+                            WHERE UserIDSent = ?;
+                        """
+                    cursor.execute(sql, Values)
+                    result = cursor.fetchall()
+                    self.TempMessageList = result
+                    i = 1
+                    for each in result:
+                        Username = self.GetUsernameFromID(each[1])
+                        if Username == "Failed To Get Username":
+                            print("Error Getting Message")
+                        else:
+                            print(i, "- Message To " + Username)
+                        i += 1
+            except:
+                print("Error Getting Outbox")
         elif Cmd == "recieve":
             try:
                 MessageToRecieve = Parameter[0]
@@ -345,7 +383,7 @@ class User():
             except:
                 print("Message Failed To Delete")
         elif Cmd == "cmds":
-            print("'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message")
+            print("'Message' '{Username}' '{Message}' -- Sends A Message To Selected User \n'Inbox' -- Gives A List Of All Incoming Messages \n'Recieve' '{Number From Inbox Or 'All'}' -- Recieves The Message Selected \n'Delete' '{Number From Inbox Or 'All'}' -- Deletes The Selected Message \n'Outbox' -- Checks All Outgoing Messages")
 
     def UpdateBalance(self):
         with sqlite3.connect("Data.db") as db:
@@ -442,8 +480,22 @@ class User():
         print(Parameter)
         Cmd = Parameter[0].lower()
         del Parameter[0]
-        if Cmd == "":
-            pass
+        if Cmd == "update":
+            Cmd2 = Parameter[0].lower()
+            del Parameter[0]
+            if Cmd2 == "password":
+                print(Parameter)
+                Password = Parameter[0]
+                NewPass = Parameter[1]
+                print(Password)
+                print(NewPass)
+                if self.CheckPassword(Password, self.GetUserID()):
+                    self.UpdatePassword(NewPass, self.GetUserID())
+                    print("Success")
+                else:
+                    print("Wrong Password!")
+        elif Cmd == "cmds":
+            print("'Update' 'Password / Username / Email' '{Old Data}' '{New Data}' '{Confirm Data}' -- Updates Values")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
