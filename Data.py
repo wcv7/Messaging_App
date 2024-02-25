@@ -377,6 +377,14 @@ class User():
                         cursor.execute(sql, Values)
                         result = cursor.fetchall()
                         self.TempMessageList = result
+                        i = 1
+                        for each in result:
+                            Username = self.GetUsernameFromID(each[1])
+                            if Username == "Failed To Get Username":
+                                print("Error Getting Message")
+                            else:
+                                print(i, "- Message To " + Username)
+                            i += 1
                 else:
                     with sqlite3.connect("Data.db") as db:
                         cursor = db.cursor()
@@ -394,6 +402,14 @@ class User():
                         cursor.execute(sql, Values)
                         result = cursor.fetchall()
                         self.TempMessageList = result
+                        i = 1
+                        for each in result:
+                            Username = self.GetUsernameFromID(each[1])
+                            if Username == "Failed To Get Username":
+                                print("Error Getting Message")
+                            else:
+                                print(i, "- Message To " + Username)
+                            i += 1
             except:
                 print("Message Failed To Delete")
         elif Cmd == "cmds":
