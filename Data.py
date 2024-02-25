@@ -183,6 +183,34 @@ class User():
                     return False
         except:
             return False
+        
+    def ChangeTableName(self, Name):
+        try:
+            with sqlite3.connect("Data.db") as db:
+                cursor = db.cursor()
+                sql = """ALTER TABLE {}
+                         RENAME TO {}
+                      """.format(self.GetUsername(), Name)
+                cursor.execute(sql)
+            print("Success")
+        except:
+            print("Failed To Change Table Name")
+        
+    def InitialisePassManager(self, Username):
+        try:
+            with sqlite3.connect("Data.db") as db:
+                cursor = db.cursor()
+                sql = """CREATE TABLE IF NOT EXISTS {}(
+                            AccountID integer,
+                            AccountName text,
+                            AccountUsername text,
+                            AccountPassword text,
+                            Extra text,
+                            Primary key(AccountID));
+                        """.format(Username)
+                cursor.execute(sql)
+        except:
+            print("Failed To Create Table")
 
     def UpdateData(self, Data , Field, UserID):
         if Data == "password":
@@ -206,6 +234,7 @@ class User():
         if UserID != False:
             if self.CheckPassword(Password, UserID):
                 self.LogAssociate(UserID)
+                self.InitialisePassManager(self.GetUsernameFromID(UserID))
                 return True
             else:
                 return False
@@ -236,6 +265,7 @@ class User():
 
     def SignUp(self, FName, LName, Username, Email, Password):
         if self.CreateAccount(FName, LName, Username, Email, Password):
+            self.InitialisePassManager(Username)
             return True
         else:
             return False
@@ -527,14 +557,30 @@ class User():
                 if self.SearchUser(NewUser):
                     print("Username Already Exists")
                 else:
+                    self.ChangeTableName(NewUser)
                     self.UpdateData(Cmd2, NewUser, self.GetUserID())
                     print("Success")
             elif Cmd2 == "email":
-                pass
+                Email = Parameter[0]
+                NewEmail = Parameter[1]
+                if self.SearchUser(NewEmail):
+                    print("Username Already Exists")
+                else:
+                    self.UpdateData(Cmd2, NewEmail, self.GetUserID())
+                    print("Success")
             else:
                 print("Wrong Command")
         elif Cmd == "cmds":
             print("'Update' '{Password / Username / Email}' '{Old Data}' '{New Data}' -- Updates Values \n'Back' -- Goes Back To Main App")
+
+    def PassManager(self, Parameter):
+        print(Parameter)
+        Cmd = Parameter[0].lower()
+        del Parameter[0]
+        if Cmd == "show":
+            pass
+        elif Cmd == "cmds":
+            print("'Back' -- Goes Back To Main App")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
@@ -547,5 +593,7 @@ class User():
             self.Settings(Parameter)
         elif Cmd == "banking":
             self.Bank(Parameter)
+        elif Cmd == "passmanager":
+            self.PassManager(Parameter)
         elif Cmd == "cmds":
             print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings \n'Exit' -- Exits App")

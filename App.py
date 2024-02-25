@@ -26,6 +26,18 @@ def Bank():
         else:
             FinalCommand = "Banking " + UserInput
             CurrentUser.Command(FinalCommand)
+
+def PassManager():
+    while True:
+        UserInput = input("PassManager >")
+        if UserInput.lower() == "back":
+            os.system("cls")
+            break
+        elif UserInput.lower() == "clear":
+            os.system("cls")
+        else:
+            FinalCommand = "PassManager " + UserInput
+            CurrentUser.Command(FinalCommand)
             
 def Settings():
     passverify = input("Please Verify Your Password: ")
