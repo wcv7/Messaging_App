@@ -66,7 +66,7 @@ def Main():
             Bank()
         elif UserInput.lower() == "logout":
             os.system("cls")
-            Login(Exit)
+            Login()
         elif UserInput.lower() == "exit":
             exit()
         else:
