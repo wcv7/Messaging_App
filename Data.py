@@ -438,6 +438,13 @@ class User():
         elif Cmd == "cmds":
             print("'Balance' '{Username}' '{Password}' -- Checks Balance, Username If You Want To See Another Account \n'Send' '{Username}' '{Amount}' -- Sends Selected User Amount Of Money \n'Transfer' '{Username}' '{Amount}' '{Password}' -- Transfers Amount From Account")
 
+    def Settings(self, Parameter):
+        print(Parameter)
+        Cmd = Parameter[0].lower()
+        del Parameter[0]
+        if Cmd == "":
+            pass
+
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
         print(Parameter)
@@ -445,10 +452,12 @@ class User():
         del Parameter[0]
         if Cmd == "messaging":
             self.Messaging(Parameter)
+        elif Cmd == "settings":
+            self.Settings(Parameter)
         elif Cmd == "banking":
             self.Bank(Parameter)
         elif Cmd == "cmds":
-            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App")
+            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings")
         
     def CheckMessages(self):
         pass

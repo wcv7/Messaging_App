@@ -3,8 +3,8 @@ import Commands
 import os
 Data.Initialise()
 
-def Message(Exit):
-    while Exit != True:
+def Message():
+    while True:
         UserInput = input("Messaging >")
         if UserInput.lower() == "back":
             break
@@ -14,8 +14,8 @@ def Message(Exit):
             FinalCommand = "Messaging " + UserInput
             CurrentUser.Command(FinalCommand)
 
-def Bank(Exit):
-    while Exit != True:
+def Bank():
+    while True:
         UserInput = input("Bank >")
         if UserInput.lower() == "back":
             break
@@ -24,6 +24,23 @@ def Bank(Exit):
         else:
             FinalCommand = "Banking " + UserInput
             CurrentUser.Command(FinalCommand)
+            
+def Settings():
+    passverify = input("Please Verify Your Password: ")
+    if CurrentUser.CheckPassword(passverify, CurrentUser.GetUserID()):
+        while True:
+            UserInput = input("Settings >")
+            if UserInput.lower() == "back":
+                break
+            elif UserInput.lower() == "clear":
+                os.system("cls")
+            else:
+                FinalCommand = "Settings " + UserInput
+                CurrentUser.Command(FinalCommand)
+    elif passverify == "back":
+        exit
+    else:
+        print("Wrong Password!")
 
 def Main(Exit):
     print("Use 'cmds' For Commands")
@@ -32,11 +49,13 @@ def Main(Exit):
     while Exit != True:
         UserInput = input(">")
         if UserInput.lower() == "message":
-            Message(Exit)
+            Message()
+        elif UserInput.lower() == "settings":
+            Settings()
         elif UserInput.lower() == "clear":
             os.system("cls")
         elif UserInput.lower() == "bank":
-            Bank(Exit)
+            Bank()
         elif UserInput.lower() == "logout":
             Login(Exit)
         elif UserInput.lower() == "exit":
