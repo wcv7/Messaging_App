@@ -370,6 +370,13 @@ class User():
                         cursor.execute(sql, Values)
                         db.commit()
                         print("Successfully Deleted Message!")
+                        Values = (self.GetUserID())
+                        sql = """SELECT MessageID, UserID FROM Message
+                            WHERE UserIDSent = ?;
+                        """
+                        cursor.execute(sql, Values)
+                        result = cursor.fetchall()
+                        self.TempMessageList = result
                 else:
                     with sqlite3.connect("Data.db") as db:
                         cursor = db.cursor()
@@ -380,6 +387,13 @@ class User():
                         cursor.execute(sql, Values)
                         db.commit()
                         print("All Messages Successfully Deleted!")
+                        Values = (self.GetUserID())
+                        sql = """SELECT MessageID, UserID FROM Message
+                            WHERE UserIDSent = ?;
+                        """
+                        cursor.execute(sql, Values)
+                        result = cursor.fetchall()
+                        self.TempMessageList = result
             except:
                 print("Message Failed To Delete")
         elif Cmd == "cmds":
