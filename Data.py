@@ -370,7 +370,7 @@ class User():
                         cursor.execute(sql, Values)
                         db.commit()
                         print("Successfully Deleted Message!")
-                        Values = (self.GetUserID())
+                        Values = (self.GetUserID(),)
                         sql = """SELECT MessageID, UserID FROM Message
                             WHERE UserIDSent = ?;
                         """
@@ -387,7 +387,7 @@ class User():
                         cursor.execute(sql, Values)
                         db.commit()
                         print("All Messages Successfully Deleted!")
-                        Values = (self.GetUserID())
+                        Values = (self.GetUserID(),)
                         sql = """SELECT MessageID, UserID FROM Message
                             WHERE UserIDSent = ?;
                         """
