@@ -102,8 +102,6 @@ def SignUp():
             os.system("cls")
             Login()
 
-
-
 if __name__ == "__main__":
     CurrentUser = Data.User()
     UserInput = input("Do You Have An Account (Y/N)? ")
