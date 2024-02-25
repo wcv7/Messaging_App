@@ -525,7 +525,7 @@ class User():
                 else:
                     print("Wrong Password!")
         elif Cmd == "cmds":
-            print("'Update' 'Password / Username / Email' '{Old Data}' '{New Data}' '{Confirm Data}' -- Updates Values")
+            print("'Update' '{Password / Username / Email}' '{Old Data}' '{New Data}' '{Confirm Data}' -- Updates Values")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
@@ -540,12 +540,3 @@ class User():
             self.Bank(Parameter)
         elif Cmd == "cmds":
             print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings")
-        
-    def CheckMessages(self):
-        pass
-
-    def CheckMessagesFrom(self, FromUser):
-        pass
-        
-    def Message(self, ToUser, Message):
-        pass
