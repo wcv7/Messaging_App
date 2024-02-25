@@ -248,8 +248,8 @@ class User():
             with sqlite3.connect("Data.db") as db:
                 cursor = db.cursor()
                 sql = """INSERT INTO User(Firstname, Lastname, Username, Email, Password)
-                        Values(?, ?, ?, ?, ?)
-                    """
+                         Values(?, ?, ?, ?, ?)
+                      """
                 cursor.execute(sql, Values)
                 db.commit()
                 UserID = self.FindUserID(Username)
@@ -541,35 +541,38 @@ class User():
         Cmd = Parameter[0].lower()
         del Parameter[0]
         if Cmd == "update":
-            Cmd2 = Parameter[0].lower()
-            del Parameter[0]
-            if Cmd2 == "password":
-                Password = Parameter[0]
-                NewPass = Parameter[1]
-                if self.CheckPassword(Password, self.GetUserID()):
-                    self.UpdateData(Cmd2, NewUser, self.GetUserID())
-                    print("Success")
+            try:
+                Cmd2 = Parameter[0].lower()
+                del Parameter[0]
+                if Cmd2 == "password":
+                    Password = Parameter[0]
+                    NewPass = Parameter[1]
+                    if self.CheckPassword(Password, self.GetUserID()):
+                        self.UpdateData(Cmd2, NewUser, self.GetUserID())
+                        print("Success")
+                    else:
+                        print("Wrong Password!")
+                elif Cmd2 == "username":
+                    Username = Parameter[0]
+                    NewUser = Parameter[1]
+                    if self.SearchUser(NewUser):
+                        print("Username Already Exists")
+                    else:
+                        self.ChangeTableName(NewUser)
+                        self.UpdateData(Cmd2, NewUser, self.GetUserID())
+                        print("Success")
+                elif Cmd2 == "email":
+                    Email = Parameter[0]
+                    NewEmail = Parameter[1]
+                    if self.SearchUser(NewEmail):
+                        print("Username Already Exists")
+                    else:
+                        self.UpdateData(Cmd2, NewEmail, self.GetUserID())
+                        print("Success")
                 else:
-                    print("Wrong Password!")
-            elif Cmd2 == "username":
-                Username = Parameter[0]
-                NewUser = Parameter[1]
-                if self.SearchUser(NewUser):
-                    print("Username Already Exists")
-                else:
-                    self.ChangeTableName(NewUser)
-                    self.UpdateData(Cmd2, NewUser, self.GetUserID())
-                    print("Success")
-            elif Cmd2 == "email":
-                Email = Parameter[0]
-                NewEmail = Parameter[1]
-                if self.SearchUser(NewEmail):
-                    print("Username Already Exists")
-                else:
-                    self.UpdateData(Cmd2, NewEmail, self.GetUserID())
-                    print("Success")
-            else:
-                print("Wrong Command")
+                    print("Wrong Command")
+            except:
+                print("Error")
         elif Cmd == "cmds":
             print("'Update' '{Password / Username / Email}' '{Old Data}' '{New Data}' -- Updates Values \n'Back' -- Goes Back To Main App")
 
@@ -578,13 +581,66 @@ class User():
         Cmd = Parameter[0].lower()
         del Parameter[0]
         if Cmd == "show":
-            pass
+            try:
+                Cmd2 = Parameter[0].lower()
+                if Cmd2 == "all":
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        sql = """SELECT * FROM {}
+                            """.format(self.GetUsername())
+                        cursor.execute(sql)
+                        result = cursor.fetchall()
+                        print("AccountID - Account Name  Account Username  Account Password  Extra")
+                        for each in result:
+                            if each[4] == None:
+                                print(f"{each[0]} - {Encrypt.Encryptor.Decrypt(each[1])} {Encrypt.Encryptor.Decrypt(each[2])} {Encrypt.Encryptor.Decrypt(each[3])}")
+                            else:
+                                print(f"{each[0]} - {Encrypt.Encryptor.Decrypt(each[1])} {Encrypt.Encryptor.Decrypt(each[2])} {Encrypt.Encryptor.Decrypt(each[3])} {Encrypt.Encryptor.Decrypt(each[4])}")
+                else:
+                    with sqlite3.connect("Data.db") as db:
+                        cursor = db.cursor()
+                        Field = Parameter[0]
+                        Field = Encrypt.Encryptor.Encrypt(Field)
+                        Values = (Field, Field)
+                        sql = """SELECT * FROM {}
+                                    WHERE AccountName = ? OR AccountUsername = ?
+                                """.format(self.GetUsername())
+                        cursor.execute(sql, Values)
+                        result = cursor.fetchall()
+                        for each in result:
+                            if each[4] == None:
+                                print(f"{each[0]} - {Encrypt.Encryptor.Decrypt(each[1])} {Encrypt.Encryptor.Decrypt(each[2])} {Encrypt.Encryptor.Decrypt(each[3])}")
+                            else:
+                                print(f"{each[0]} - {Encrypt.Encryptor.Decrypt(each[1])} {Encrypt.Encryptor.Decrypt(each[2])} {Encrypt.Encryptor.Decrypt(each[3])} {Encrypt.Encryptor.Decrypt(each[4])}")
+            except:
+                print("Error")
+        elif Cmd == "create":
+            try:
+                AccountName = Parameter[0]
+                AccountName = Encrypt.Encryptor.Encrypt(AccountName)
+                AccountUser = Parameter[1]
+                AccountUser = Encrypt.Encryptor.Encrypt(AccountUser)
+                AccountPass = Parameter[2]
+                AccountPass = Encrypt.Encryptor.Encrypt(AccountPass)
+                Extra = None
+                if len(Parameter) > 3:
+                    Extra = Parameter[3]
+                    Extra = Encrypt.Encryptor.Encrypt(Extra)
+                Values = (AccountName, AccountUser, AccountPass, Extra)
+                with sqlite3.connect("Data.db") as db:
+                    cursor = db.cursor()
+                    sql = """INSERT INTO {}(AccountName, AccountUsername, AccountPassword, Extra)
+                                Values(?, ?, ?, ?)
+                            """.format(self.GetUsername())
+                    cursor.execute(sql, Values)
+                print("Success")
+            except:
+                print("Error")
         elif Cmd == "cmds":
             print("'Back' -- Goes Back To Main App")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
-        print(Parameter)
         Cmd = Parameter[0].lower()
         del Parameter[0]
         if Cmd == "messaging":
@@ -596,4 +652,4 @@ class User():
         elif Cmd == "passmanager":
             self.PassManager(Parameter)
         elif Cmd == "cmds":
-            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings \n'Exit' -- Exits App")
+            print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings \n'Passmanager' -- Sends You To The Password Managing App \n'Exit' -- Exits App")

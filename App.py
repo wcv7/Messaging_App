@@ -76,6 +76,9 @@ def Main():
         elif UserInput.lower() == "bank":
             os.system("cls")
             Bank()
+        elif UserInput.lower() == "passmanager":
+            os.system("cls")
+            PassManager()
         elif UserInput.lower() == "logout":
             os.system("cls")
             Login()
