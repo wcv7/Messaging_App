@@ -3,8 +3,6 @@ import Commands
 import os
 Data.Initialise()
 
-# Test
-
 def Message():
     while True:
         UserInput = input("Messaging >")
