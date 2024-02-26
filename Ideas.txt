@@ -2,7 +2,18 @@ Banking System /
 -- Add Encryption To Passwords And Messages *
 Password Manager /
 
-
 --Later:
 
 Friends System
+
+Friends System Table Layout:
+
+UserID      Friends     Friend Requests
+
+When User Searches Friend Requests (Can Ask Specific Person) Shows Friend Requests And Can Accept By Word Accept
+
+Add A Function AddFriend: Moves UserID From Friend Requests To Friend And Moves UserID Who Accept To UserID Who Requested To Friends
+
+Then Have To Add A Unfriend System, PAIIINNN
+
+Table First!
