@@ -295,7 +295,6 @@ class User():
             for each in Parameter:
                 Message += each + " "
             Message = Encrypt.Encryptor.Encrypt(Message)
-            print(Message)
             if self.SearchUser(UserTo):
                 SendToUser = self.FindUserID(UserTo)
                 Values = (SendToUser, self.GetUserID(), Message)
@@ -375,13 +374,15 @@ class User():
                     with sqlite3.connect("Data.db") as db:
                         cursor = db.cursor()
                         Values = (self.GetUserID(),)
-                        sql = """SELECT Message FROM Message
+                        sql = """SELECT Message, UserID FROM Message
                                 WHERE UserID = ?;
                             """
                         cursor.execute(sql, Values)
                         result = cursor.fetchall()
+                        i = 1
                         for each in result:
-                            print(each[0])
+                            print(i, "- " + self.GetUsernameFromID(each[1]) + ":", Encrypt.Encryptor.Decrypt(each[0]))
+                            i += 1
             except:
                 print("Message Failed To Recieve")
         elif Cmd == "delete":
@@ -637,7 +638,7 @@ class User():
             except:
                 print("Error")
         elif Cmd == "cmds":
-            print("'Back' -- Goes Back To Main App")
+            print("'Show' 'All' Or '{Name Or Account Name}' -- Shows All Or Corresponding Accounts \n'Create' '{Name}' '{Account Username}' '{Account Password}' '{Extra}' -- Creates An Account With The Details \n'Back' -- Goes Back To Main App")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
