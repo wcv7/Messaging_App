@@ -32,6 +32,15 @@ def Initialise():
                  Primary key(UserID));
                """
         cursor.execute(sql)
+    with sqlite3.connect("Data.db") as db:
+        cursor = db.cursor()
+        sql = """CREATE TABLE IF NOT EXISTS Social(
+                 UserID integer,
+                 Friends integer,
+                 FriendRequests integer,
+                 Primary key(UserID));
+               """
+        cursor.execute(sql)
 def ViewTable():
     with sqlite3.connect("Data.db") as db:
         cursor = db.cursor()
@@ -295,7 +304,6 @@ class User():
             for each in Parameter:
                 Message += each + " "
             Message = Encrypt.Encryptor.Encrypt(Message)
-            print(Message)
             if self.SearchUser(UserTo):
                 SendToUser = self.FindUserID(UserTo)
                 Values = (SendToUser, self.GetUserID(), Message)
@@ -375,13 +383,15 @@ class User():
                     with sqlite3.connect("Data.db") as db:
                         cursor = db.cursor()
                         Values = (self.GetUserID(),)
-                        sql = """SELECT Message FROM Message
+                        sql = """SELECT Message, UserID FROM Message
                                 WHERE UserID = ?;
                             """
                         cursor.execute(sql, Values)
                         result = cursor.fetchall()
+                        i = 1
                         for each in result:
-                            print(each[0])
+                            print(i, "- " + self.GetUsernameFromID(each[1]) + ":", Encrypt.Encryptor.Decrypt(each[0]))
+                            i += 1
             except:
                 print("Message Failed To Recieve")
         elif Cmd == "delete":
@@ -637,7 +647,20 @@ class User():
             except:
                 print("Error")
         elif Cmd == "cmds":
-            print("'Back' -- Goes Back To Main App")
+            print("'Show' 'All' Or '{Name Or Account Name}' -- Shows All Or Corresponding Accounts \n'Create' '{Name}' '{Account Username}' '{Account Password}' '{Extra}' -- Creates An Account With The Details \n'Back' -- Goes Back To Main App")
+
+    def Social(self, Parameter):
+        Parameter = Parameter.split(" ")
+        Cmd = Parameter[0].lower()
+        del Parameter[0]
+        if Cmd == "friend":
+            try:
+                Username = Parameter[0]
+                with sqlite3.connect("Data.db") as db:
+                    cursor = db.cursor()
+                    Values = (self.GetUserID, self.FindUserID(Username))
+            except:
+                print("Error")
 
     def Command(self, Parameter):
         Parameter = Parameter.split(" ")
@@ -651,5 +674,7 @@ class User():
             self.Bank(Parameter)
         elif Cmd == "passmanager":
             self.PassManager(Parameter)
+        elif Cmd == "social":
+            self.Social(Parameter)
         elif Cmd == "cmds":
             print("'Cmds' -- Gives List Of All Commands \n'Message' -- Sends You To The Messaging App \n'Bank' -- Sends You To The Bank App \n'Settings' -- Sends You To Settings \n'Passmanager' -- Sends You To The Password Managing App \n'Exit' -- Exits App")

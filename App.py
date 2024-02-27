@@ -3,14 +3,17 @@ import Commands
 import os
 Data.Initialise()
 
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
+
 def Message():
     while True:
         UserInput = input("Messaging >")
         if UserInput.lower() == "back":
-            os.system("cls")
+            cls()
             break
         elif UserInput.lower() == "clear":
-            os.system("cls")
+            cls()
         else:
             FinalCommand = "Messaging " + UserInput
             CurrentUser.Command(FinalCommand)
@@ -19,10 +22,10 @@ def Bank():
     while True:
         UserInput = input("Bank >")
         if UserInput.lower() == "back":
-            os.system("cls")
+            cls()
             break
         elif UserInput.lower() == "clear":
-            os.system("cls")
+            cls()
         else:
             FinalCommand = "Banking " + UserInput
             CurrentUser.Command(FinalCommand)
@@ -31,10 +34,10 @@ def PassManager():
     while True:
         UserInput = input("PassManager >")
         if UserInput.lower() == "back":
-            os.system("cls")
+            cls()
             break
         elif UserInput.lower() == "clear":
-            os.system("cls")
+            cls()
         else:
             FinalCommand = "PassManager " + UserInput
             CurrentUser.Command(FinalCommand)
@@ -42,14 +45,14 @@ def PassManager():
 def Settings():
     passverify = input("Please Verify Your Password: ")
     if CurrentUser.CheckPassword(passverify, CurrentUser.GetUserID()):
-        os.system("cls")
+        cls()
         while True:
             UserInput = input("Settings >")
             if UserInput.lower() == "back":
-                os.system("cls")
+                cls()
                 break
             elif UserInput.lower() == "clear":
-                os.system("cls")
+                cls()
             else:
                 FinalCommand = "Settings " + UserInput
                 CurrentUser.Command(FinalCommand)
@@ -59,28 +62,28 @@ def Settings():
         print("Wrong Password!")
 
 def Main():
-    os.system("cls")
+    cls()
     print("Use 'cmds' For Commands")
     UserCommands = Commands.Commands()
     UserCommands.Initialise(CurrentUser.UserID)
     while True:
         UserInput = input(">")
         if UserInput.lower() == "message":
-            os.system("cls")
+            cls()
             Message()
         elif UserInput.lower() == "settings":
-            os.system("cls")
+            cls()
             Settings()
         elif UserInput.lower() == "clear":
-            os.system("cls")
+            cls()
         elif UserInput.lower() == "bank":
-            os.system("cls")
+            cls()
             Bank()
         elif UserInput.lower() == "passmanager":
-            os.system("cls")
+            cls()
             PassManager()
         elif UserInput.lower() == "logout":
-            os.system("cls")
+            cls()
             Login()
         elif UserInput.lower() == "exit":
             exit()
@@ -93,7 +96,7 @@ def Login():
         SignUp()
     PasswordInput = input("Enter Your Password: ")
     if CurrentUser.Login(FieldInput, PasswordInput):
-        os.system("cls")
+        cls()
         Main()
     else:
         print("Incorrect Username Or Password!")
@@ -102,19 +105,19 @@ def Login():
 def SignUp():
     FNInput = input("Enter Your Firstname: ")
     if FNInput.lower() == "login":
-        os.system("cls")
+        cls()
         Login()
     LNInput = input("Enter Your Lastname:  ")
     UserInput = input("Enter A Username: ")
     if CurrentUser.SearchUser(UserInput):
         print("Username Already Exists!")
-        os.system("cls")
+        cls()
         SignUp()
     else:
         EmailInput = input("Enter Your Email: ")
         PassInput = input("Enter A Password: ")
         if CurrentUser.SignUp(FNInput, LNInput, UserInput, EmailInput, PassInput):
-            os.system("cls")
+            cls()
             Login()
 
 if __name__ == "__main__":
